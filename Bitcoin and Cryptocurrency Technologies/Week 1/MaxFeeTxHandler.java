@@ -1,4 +1,12 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MaxFeeTxHandler {
 
@@ -14,6 +22,7 @@ public class MaxFeeTxHandler {
         }
 
         public boolean isValidTx(Transaction tx) {
+
                 Predicate<Transaction> utxosClaimedByTxAreInPool = transaction -> utxoPool.getAllUTXO()
                                 .containsAll(getUTXOsClaimedByTx.apply(transaction));
                 Predicate<Transaction> allInputsHaveValidSignature = transaction -> transaction
@@ -26,11 +35,14 @@ public class MaxFeeTxHandler {
                                                                 transaction.getRawDataToSign(
                                                                                 transaction.getInputs().indexOf(in)),
                                                                 in.signature));
+
                 Predicate<Transaction> noUTXOisClaimedMultipleTimes = transaction -> getUTXOsClaimedByTx
                                 .apply(transaction)
                                 .size() == getUTXOsClaimedByTx.andThen(HashSet::new).apply(transaction).size();
+
                 Predicate<Transaction> allOutputValuesAreNonNegative = transaction -> transaction.getOutputs().stream()
                                 .map(o -> o.value).noneMatch(value -> value < 0.0);
+
                 Predicate<Transaction> totalOutputValueLessThanTotalInputValue = transaction -> transaction.getOutputs()
                                 .stream().mapToDouble(o -> o.value).sum() < getUTXOsClaimedByTx
                                                 .apply(transaction)
