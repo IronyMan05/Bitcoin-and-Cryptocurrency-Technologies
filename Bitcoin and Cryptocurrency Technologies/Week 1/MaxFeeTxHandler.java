@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MaxFeeTxHandler {
-
+        
         private UTXOPool utxoPool;
         private Function<Transaction, List<UTXO>> getUTXOsClaimedByTx = transaction -> transaction
                         .getInputs()
